@@ -33,7 +33,6 @@ const Index = () => {
     const [permission] = HasAccess(['Meetings'])
     const dispatch = useDispatch()
 
-
     const actionHeader = {
         Header: "Action", isSortable: false, center: true,
         cell: ({ row }) => (
@@ -72,7 +71,11 @@ const Index = () => {
         },
         { Header: "Date & Time", accessor: "dateTime", },
         { Header: "Time Stamp", accessor: "timestamp", },
-        { Header: "Create By", accessor: "createdByName", },
+        {
+            Header: 'Create By', accessor: 'createBy', cell: (cell) => (
+                <span>{`${cell.value?.firstName} ${cell.value?.lastName}`}</span>
+            )
+        },
         ...(permission?.update || permission?.view || permission?.delete ? [actionHeader] : [])
 
     ];
@@ -111,6 +114,7 @@ const Index = () => {
 
     useEffect(() => {
         fetchData();
+        setAction(false);
     }, [action])
 
     return (

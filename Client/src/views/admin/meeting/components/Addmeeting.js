@@ -24,9 +24,8 @@ const AddMeeting = (props) => {
 
 
     const user = JSON.parse(localStorage.getItem('user'))
-
+    
     const contactList = useSelector((state) => state?.contactData?.data)
-
 
     const initialValues = {
         agenda: '',
@@ -43,17 +42,39 @@ const AddMeeting = (props) => {
         initialValues: initialValues,
         validationSchema: MeetingSchema,
         onSubmit: (values, { resetForm }) => {
-            
+            AddData(values);
+            resetForm();
         },
     });
     const { errors, touched, values, handleBlur, handleChange, handleSubmit, setFieldValue } = formik
 
-    const AddData = async () => {
-
+    const AddData = async (values) => {
+        setIsLoding(true);
+        try {
+            const payload = {
+                ...values,
+                attendes: values.related === "Contact" ? values.attendes : [],
+                attendesLead: values.related === "Lead" ? values.attendesLead : [],
+            };
+            
+            const response = await postApi('api/meeting/add', payload);
+    
+            if (response?.status === 200) {
+                toast.success("Meeting added successfully!");
+                onClose();
+                setAction(true);
+                // fetchAllData()
+            } else {
+                toast.error(response?.response?.data || "Something went wrong!");
+            }
+        } catch (error) {
+            toast.error(error?.response?.data || "Error while adding meeting!");
+        } finally {
+            setIsLoding(false);
+        }
     };
 
     const fetchAllData = async () => {
-        
     }
 
     useEffect(() => {
